@@ -16,8 +16,14 @@ using namespace std;
 // Default constructor
 MidwestGraph::MidwestGraph() 
 {
-	states = new string[];
-	borders = new int* [] {0};
+	states = new string[MAX_NO_OF_STATES];
+	borders = new int* [MAX_NO_OF_STATES];
+
+	for (int row = 0; row < MAX_NO_OF_STATES; ++row)
+	{
+		borders[row] = new int[MAX_NO_OF_STATES];
+	}
+
 	maxNoOfStates = MAX_NO_OF_STATES;		
 	numOfStates = 0;		
 }
@@ -25,25 +31,49 @@ MidwestGraph::MidwestGraph()
 // Overloaded constructor
 MidwestGraph::MidwestGraph(int cap)
 {
-	states = new string[]{ 0 };
-	borders = new int* [] {0};
-	maxNoOfStates = MAX_NO_OF_STATES;		
-	numOfStates = cap;		
+	states = new string[cap];
+	borders = new int* [cap];
+	for (int row = 0; row < cap; ++row)
+	{
+		borders[row] = new int[cap];
+	}
+
+	maxNoOfStates = cap;		
+	numOfStates = 0;
 }
 
 // Copy constructor
+//MidwestGraph::MidwestGraph(const MidwestGraph& other)
+//{
+//	states = other.states;
+//	borders = other.borders;
+//	maxNoOfStates = MAX_NO_OF_STATES;
+//	numOfStates = other.numOfStates;
+
+//	for (int i = 0; i < numOfStates; ++i)
+//	{
+//		states[i] = other.states[i];
+//		borders[i] = other.borders[i];
+//	}
+//}
+
 MidwestGraph::MidwestGraph(const MidwestGraph& other)
 {
-	states = other.states;
-	borders = other.borders;
-	maxNoOfStates = MAX_NO_OF_STATES;
-	numOfStates = other.numOfStates;
 
-	for (int i = 0; i < numOfStates; ++i)
+	for (int i = 0; i < maxNoOfStates; ++i)
 	{
-		borders[i] = other.borders[i];
+		states[i] = other.states[i];
+		for (int j = 0; j < maxNoOfStates; ++j)
+		{
+			borders[i][j] = other.borders[i][j];
+		}
 	}
+	
+
+	maxNoOfStates = other.maxNoOfStates;
+	numOfStates = other.numOfStates;
 }
+
 
 // Definition of overloaded assignment operator
 MidwestGraph& MidwestGraph::operator=(const MidwestGraph& other)
@@ -54,20 +84,28 @@ MidwestGraph& MidwestGraph::operator=(const MidwestGraph& other)
 	}
 	else
 	{
-		if (numOfStates != other.numOfStates)
+		if (maxNoOfStates != other.maxNoOfStates)
 		{
+			delete[] states;
 			delete[] borders;
-			borders = new int*[other.numOfStates];
+			states = new string[other.maxNoOfStates];
+			maxNoOfStates = other.maxNoOfStates;
+			// borders = new int*[other.numOfStates];
+		}
+
+		//maxNoOfStates = other.maxNoOfStates;
+		//states = other.states;
+
+		for (int i = 0; i < other.numOfStates; ++i)
+		{
+			states[i] = other.states[i];
+			for (int j = 0; j < other.numOfStates; ++j)
+			{
+				borders[i][j] = other.borders[i][j];
+			}
 		}
 
 		numOfStates = other.numOfStates;
-		maxNoOfStates = other.maxNoOfStates;
-		states = other.states;
-
-		for (int i = 0; i < maxNoOfStates; ++i)
-		{
-			borders[i] = other.borders[i];
-		}
 	}
 
 	return *this;
@@ -77,13 +115,13 @@ MidwestGraph& MidwestGraph::operator=(const MidwestGraph& other)
 void MidwestGraph::createGraph(const vector<string>& otherStates,
 	const vector<vector<int>>& otherNeighbors)
 {
-	for (int i = 0; i < numOfStates; i++)
+
+	for (int i = 0; i < maxNoOfStates; i++)
 	{
-		states[i] = otherStates[i];		// Transfers state data
-		
-		for (int j = 0; j < numOfStates; j++)
+		states[i] = otherStates[i];				// transfers labels
+		for (int j = 0; j < maxNoOfStates; ++j)
 		{
-			borders[i][j] = otherNeighbors[i][j];	// Transfers edge data
+			borders[i][j] = otherNeighbors[i][j];	// transfers edge data
 		}
 	}
 }
@@ -94,7 +132,10 @@ void MidwestGraph::createGraph(const vector<string>& otherStates,
 // Assume there is at least one state.
 void MidwestGraph::printStates() const
 {
-	cout << "printStates() called" << endl;
+	for (int i = 0; i < maxNoOfStates; ++i)
+	{
+		cout << "      " << states[i] << endl;
+	}
 }
 
 // Definition of function printBorderingStates
@@ -115,4 +156,8 @@ void MidwestGraph::printBFS(const std::string& states) const
 
 // Destructor
 
-MidwestGraph::~MidwestGraph(){}
+MidwestGraph::~MidwestGraph()
+{
+	delete[] states, delete[] borders;
+	states = nullptr, borders = nullptr;
+}

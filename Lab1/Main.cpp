@@ -43,10 +43,11 @@ int main()
 
 	};
 
+
 	MidwestGraph graph(12);
-	/*graph.createGraph(states, neighbors);
+	graph.createGraph(states, neighbors);
 	print(graph, states);
-	printBFS(graph, states);*/
+	printBFS(graph, states);
 
 	std::cout << std::endl;
 	return 0;
