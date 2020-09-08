@@ -43,7 +43,6 @@ int main()
 
 	};
 
-
 	MidwestGraph graph(12);
 	graph.createGraph(states, neighbors);
 	print(graph, states);
@@ -64,7 +63,7 @@ void print(const MidwestGraph& graph,
 	{
 		std::cout << "   " << i << "\n";
 		std::cout << "=> ";
-		graph.printBorderingStates(i);
+		graph.printBorderingStates(i);	// prints bordering states per state
 		std::cout << "\n";
 	}
 }
