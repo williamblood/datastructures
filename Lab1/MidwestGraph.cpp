@@ -4,7 +4,7 @@
 	September 2, 2020
 
 	CS A200
-	Lab 1
+	Lab 1 - Graphs
 */
 
 #include "MidwestGraph.h"
@@ -18,29 +18,34 @@ MidwestGraph::MidwestGraph()
 {
 	states = new string[MAX_NO_OF_STATES];
 	borders = new int* [MAX_NO_OF_STATES];
+	maxNoOfStates = MAX_NO_OF_STATES;
+	numOfStates = 0;
 
 	for (int row = 0; row < MAX_NO_OF_STATES; ++row)
 	{
 		borders[row] = new int[MAX_NO_OF_STATES];
+		
+		for (int column = 0; column < MAX_NO_OF_STATES; ++column)
+			borders[row][column] = 0;
 	}
 
-	maxNoOfStates = MAX_NO_OF_STATES;		
-	numOfStates = 0;		
+	
 }
 
 // Overloaded constructor
-MidwestGraph::MidwestGraph(int cap)
+MidwestGraph::MidwestGraph(int capacity)
 {
-	states = new string[cap];
-	borders = new int* [cap];
+	states = new string[capacity];
+	borders = new int* [capacity];
+	maxNoOfStates = capacity;
+	numOfStates = 0;
 
-	for (int row = 0; row < cap; ++row)
+	for (int row = 0; row < capacity; ++row)
 	{
-		borders[row] = new int[cap];
+		borders[row] = new int[capacity];
+
 	}
 
-	maxNoOfStates = cap;		
-	numOfStates = 0;
 }
 
 // Copy constructor
@@ -60,32 +65,41 @@ MidwestGraph::MidwestGraph(const MidwestGraph& other)
 }
 
 // Definition of overloaded assignment operator
-MidwestGraph& MidwestGraph::operator=(const MidwestGraph& other)
+MidwestGraph& MidwestGraph::operator=(const MidwestGraph& rhs)
 {
-	if (&other == this)
+	if (&rhs == this)
 	{
 		cerr << "Attempted self-assignment";
 	}
 	else
 	{
-		if (maxNoOfStates != other.maxNoOfStates)
+		if (maxNoOfStates != rhs.maxNoOfStates)
 		{
+			for (int i = 0; i < numOfStates; ++i)
+			{
+				delete[] borders[i]; 
+				borders[i] = nullptr;
+			}
+	
 			delete[] states;
 			delete[] borders;
-			states = new string[other.maxNoOfStates];
-			maxNoOfStates = other.maxNoOfStates;
+
+			states = new string[rhs.maxNoOfStates];
+			maxNoOfStates = rhs.maxNoOfStates;
+			borders = new int* [maxNoOfStates];
 		}
 
-		for (int i = 0; i < other.numOfStates; ++i)
+		numOfStates = rhs.numOfStates;
+
+		for (int i = 0; i < numOfStates; ++i)
 		{
-			states[i] = other.states[i];
-			for (int j = 0; j < other.numOfStates; ++j)
+			states[i] = rhs.states[i];
+			for (int j = 0; j < numOfStates; ++j)
 			{
-				borders[i][j] = other.borders[i][j];
+				borders[i][j] = rhs.borders[i][j];
 			}
 		}
 
-		numOfStates = other.numOfStates;
 	}
 
 	return *this;
@@ -95,15 +109,15 @@ MidwestGraph& MidwestGraph::operator=(const MidwestGraph& other)
 void MidwestGraph::createGraph(const vector<string>& otherStates,
 	const vector<vector<int>>& otherNeighbors)
 {
-	numOfStates = otherStates.size();
+	numOfStates = static_cast<int>( otherStates.size() );
 
-	for (int i = 0; i < maxNoOfStates; i++)
+	for (int i = 0; i < numOfStates; i++)
 	{
-		states[i] = otherStates[i];				// transfers labels
+		states[i] = otherStates[i];					// transfers successor data
 		
-		for (int j = 0; j < maxNoOfStates; ++j)
+		for (int j = 0; j < numOfStates; ++j)
 		{
-			borders[i][j] = otherNeighbors[i][j];	// transfers edge data
+			borders[i][j] = otherNeighbors[i][j];	// transfers predecessor data
 		}
 	}
 }
@@ -113,26 +127,24 @@ void MidwestGraph::createGraph(const vector<string>& otherStates,
 void MidwestGraph::printStates() const
 {
 	for (int i = 0; i < maxNoOfStates; ++i)
-	{
 		cout << "      " << states[i] << endl;
-	}
 }
 
 // Definition of function printBorderingStates
-void MidwestGraph::printBorderingStates(const std::string& label) const
+void MidwestGraph::printBorderingStates(const std::string& state) const
 {
-	for (int i = 0; i < numOfStates; i++)
+	int index = 0;
+
+	// Finds index corresponding to the input state
+	while (state != states[index])
+		index++;
+
+	for (int j = 0; j < numOfStates; j++)
 	{
-		if (label == states[i])
-		{
-			for (int j = 0; j < numOfStates; j++)
-			{
-				if (borders[i][j])
-					cout << states[j] << " ";
-			}
-		}
+		if (borders[index][j])
+			cout << states[j] << " ";
 	}
-	cout << endl;
+
 }
 
 // Assume the array of strings has at list one state.
@@ -140,51 +152,53 @@ void MidwestGraph::printBorderingStates(const std::string& label) const
 // Assume the given state has at least one neighbor.
 
 // Definition of function printBFS
-void MidwestGraph::printBFS(const std::string& label) const
+void MidwestGraph::printBFS(const std::string& state) const
 {
-	 // Initializes tracker that logs visited nodes.
-	bool* visited = new bool[numOfStates];
-	for (int i = 0; i < numOfStates; i++)
-	{
-		visited[i] = false;
-	}
-
-	int index = 0;			// Stores position of label (state)
+	int index = 0;			// Stores position of input state
 
 	// Finds index of corresponding vertex.
-	while (label != states[index])
-	{
+	while (state != states[index])
 		index++;
-	}
 
-	// Marks the starting vertex as visited & adds to the queue.
+	 // Stores a record of visited nodes.
+	bool* visited = new bool[numOfStates] { false };
+
+	// Marks the starting vertex as visited & is the first .
 	visited[index] = true;
-	queue<int> neighboringStates;
-	neighboringStates.push(index);
+
+	queue<int> borderingStates;
+	borderingStates.push(index);
 
 	// Enqueues all adjacent vertices corresponding to input vertex.
-	while (!neighboringStates.empty())
+	while (!borderingStates.empty())
 	{
-		index = neighboringStates.front();
-		neighboringStates.pop();
+		index = borderingStates.front();
+		borderingStates.pop();
 
-		for (int i = 0; i < maxNoOfStates; ++i)
+		for (int j = 0; j < maxNoOfStates; ++j)
 		{
-			if (!visited[i] && borders[index][i])
+			if (!visited[j] && borders[index][j])
 			{
-				visited[i] = true;
-				neighboringStates.push(i);
+				visited[j] = true;
+				borderingStates.push(j);
 
-				cout << states[i] << " ";
+				cout << states[j] << " ";
 			}
 		}
 	}
-	cout << endl;
+
+	delete[] visited; visited = nullptr;
 }
 
 // Destructor
 MidwestGraph::~MidwestGraph()
 {
-	delete[] states, delete[] borders;
-	states = nullptr, borders = nullptr;
+	// Frees each row
+	for (int row = 0; row < numOfStates; ++row)
+	{
+		delete[] borders[row];
+		borders[row] = nullptr;
+	}
+	delete[] states; states = nullptr;
+	delete[] borders; borders = nullptr;
 }
