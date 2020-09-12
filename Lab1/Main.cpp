@@ -4,7 +4,7 @@
 	September 2, 2020
 
 	CS A200
-	Lab 1
+	Lab 1 - Graphs
 */
 
 #include "MidwestGraph.h"

@@ -27,9 +27,7 @@ MidwestGraph::MidwestGraph()
 		
 		for (int column = 0; column < MAX_NO_OF_STATES; ++column)
 			borders[row][column] = 0;
-	}
-
-	
+	}	
 }
 
 // Overloaded constructor
@@ -45,23 +43,26 @@ MidwestGraph::MidwestGraph(int capacity)
 		borders[row] = new int[capacity];
 
 	}
-
 }
 
 // Copy constructor
 MidwestGraph::MidwestGraph(const MidwestGraph& other)
 {
+	maxNoOfStates = other.maxNoOfStates;
+	numOfStates = other.numOfStates;
+	states = new string[maxNoOfStates];
+	borders = new int* [maxNoOfStates];
+
 	for (int i = 0; i < maxNoOfStates; ++i)
 	{
 		states[i] = other.states[i];
+		borders[i] = new int[maxNoOfStates];
+
 		for (int j = 0; j < maxNoOfStates; ++j)
 		{
 			borders[i][j] = other.borders[i][j];
 		}
 	}
-
-	maxNoOfStates = other.maxNoOfStates;
-	numOfStates = other.numOfStates;
 }
 
 // Definition of overloaded assignment operator
@@ -94,10 +95,10 @@ MidwestGraph& MidwestGraph::operator=(const MidwestGraph& rhs)
 		for (int i = 0; i < numOfStates; ++i)
 		{
 			states[i] = rhs.states[i];
+			borders[i] = new int[numOfStates];
+
 			for (int j = 0; j < numOfStates; ++j)
-			{
 				borders[i][j] = rhs.borders[i][j];
-			}
 		}
 
 	}
@@ -116,9 +117,7 @@ void MidwestGraph::createGraph(const vector<string>& otherStates,
 		states[i] = otherStates[i];					// transfers successor data
 		
 		for (int j = 0; j < numOfStates; ++j)
-		{
-			borders[i][j] = otherNeighbors[i][j];	// transfers predecessor data
-		}
+			borders[i][j] = otherNeighbors[i][j];	// transfers predecessor 
 	}
 }
 
@@ -144,13 +143,11 @@ void MidwestGraph::printBorderingStates(const std::string& state) const
 		if (borders[index][j])
 			cout << states[j] << " ";
 	}
-
 }
 
 // Assume the array of strings has at list one state.
 // Assume the given state is in the array of strings.
 // Assume the given state has at least one neighbor.
-
 // Definition of function printBFS
 void MidwestGraph::printBFS(const std::string& state) const
 {
@@ -163,7 +160,7 @@ void MidwestGraph::printBFS(const std::string& state) const
 	 // Stores a record of visited nodes.
 	bool* visited = new bool[numOfStates] { false };
 
-	// Marks the starting vertex as visited & is the first .
+	// Marks the starting vertex as visited & adds to queue.
 	visited[index] = true;
 
 	queue<int> borderingStates;
