@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{80ded1df-d1a4-4fc6-8974-e2e43d0033e4}</ProjectGuid>
-    <RootNamespace>Lab2</RootNamespace>
+    <ProjectGuid>{d1480e89-3b3d-4bd9-b208-9a8926fc1069}</ProjectGuid>
+    <RootNamespace>GraphV2</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -139,18 +139,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\lab_02_bst_files\lab_02_bst_files\BST.cpp" />
-    <ClCompile Include="..\..\..\lab_02_bst_files\lab_02_bst_files\Functions.cpp" />
-    <ClCompile Include="..\..\..\lab_02_bst_files\lab_02_bst_files\Main.cpp" />
+    <ClInclude Include="Graph.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\lab_02_bst_files\lab_02_bst_files\BST.h" />
-    <ClInclude Include="resource.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="..\..\..\lab_02_bst_files\lab_02_bst_files\data_int_1.txt" />
-    <Text Include="..\..\..\lab_02_bst_files\lab_02_bst_files\data_int_2.txt" />
-    <Text Include="..\..\..\lab_02_bst_files\lab_02_bst_files\data_int_3.txt" />
+    <ClCompile Include="Graph.cpp" />
+    <ClCompile Include="Main_v2.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
